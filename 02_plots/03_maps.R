@@ -32,7 +32,7 @@ aha_plot <- aha_coords %>%  filter(!is.na(lon) & !is.na(lat) & !lon<(1e8*-1) & !
   mutate(`Part of system` = ifelse(in_system == T, "Yes", "No")) %>% 
   mutate(`Hospital beds` = HOSPBD)
 
-hospitals <- usmap_transform(aha_plot) 
+hospitals <- usmap_transform(aha_plot)  
 
 # ----------------------------------------------------------------------------------------------
 
