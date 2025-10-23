@@ -29,7 +29,8 @@ pacman::p_load(
   patchwork,
   ggplot2,
   gridExtra,
-  scales
+  scales,
+  sf
 )
 
 # ---- Helper: safe month parsing ----

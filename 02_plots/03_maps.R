@@ -2,37 +2,22 @@
 # March 30, 2023
 
 # Create some maps of hospitals/HHI using the usmap package
-# This now runs on cluster
-
-# Note: geo codes are messy for earlier years - need to do some cleaning
 
 # -----------------------------------------------------------------------------------------
 
-
-# install.packages("rgdal")
-# install.packages("sf")
-
-# remotes::install_github("ropensci/rnaturalearthhires")1
-
-pacman::p_load(data.table, tidyverse, arrow,
-               ggplot2, 
-               usmap, usmapdata, rgdal,
-               gridExtra)
-
-library(wesanderson, lib.loc = "~/rpackages")
-
-
-dir <- "/mnt/share/resource_tracking/us_value/data/hospital_hhi/"
+pacman::p_load(usmap, usmapdata, wesanderson)
+source('init.R')
+source('plot_functions.R')
 
 # Read data
 
-aha_coords <- fread(paste0(dir, "processed/aha_clean_2000_2019.csv")) %>% setDT()
+aha_coords <- fread(paste0(data_dir, "processed/aha_clean_2000_2019.csv")) %>% setDT()
 
-hhi_state_wide <- read_feather(paste0(dir, "processed/compiled_hhi/compiled_hhi_state_wide.feather")) %>% setDT() %>% 
+hhi_state_wide <- read_feather(paste0(data_dir, "processed/compiled_hhi/compiled_hhi_state_wide.feather")) %>% setDT() %>% 
   mutate(state = postal_code)
-hhi_hrr_wide <- read_feather(paste0(dir, "processed/compiled_hhi/compiled_hhi_hrr_wide.feather")) %>% setDT()
-hhi_county_wide <- read_feather(paste0(dir, "processed/compiled_hhi/compiled_hhi_county_wide.feather")) %>% setDT() %>% filter(cnty!="   NA")
-hhi_individ_wide <- read_feather(paste0(dir, "processed/compiled_hhi/compiled_hhi_individ_wide.feather")) %>% select(-hrrnum) %>% setDT()
+hhi_hrr_wide <- read_feather(paste0(data_dir, "processed/compiled_hhi/compiled_hhi_hrr_wide.feather")) %>% setDT()
+hhi_county_wide <- read_feather(paste0(data_dir, "processed/compiled_hhi/compiled_hhi_county_wide.feather")) %>% setDT() %>% filter(cnty!="   NA")
+hhi_individ_wide <- read_feather(paste0(data_dir, "processed/compiled_hhi/compiled_hhi_individ_wide.feather")) %>% select(-hrrnum) %>% setDT()
 
 best_hhi <- "drive_time_HOSPBD_30_minutes_gen_surg"
 
@@ -182,41 +167,6 @@ for(i in 2000:2022){
 }
 
 dev.off()
-
-# Fig 1b - categorical, COUNTY LEVEL --> lots missing. Abandon for now 
-# TODO check why counties are missing
-
-# hhi_county_wide <- hhi_county_wide %>% 
-#   mutate(hhi_cat = cut(get(best_hhi), breaks = c(0, 1500, 2500, 5000, 10000), 
-#                        labels = c("0-1,500 (unconcentrated)", "1,500-2,500 (moderately concentrated)", "2,500-5,000 (highly concentrated)", "5,000-10,000 (very highly concentrated)")),
-#          hhi_colors = case_when(hhi_cat == "0-1,500 (unconcentrated)" ~ Zissou1[1],
-#                                 hhi_cat == "1,500-2,500 (moderately concentrated)" ~ Zissou1[2],
-#                                 hhi_cat == "2,500-5,000 (highly concentrated)" ~ Zissou1[3],
-#                                 hhi_cat == "5,000-10,000 (very highly concentrated)" ~ Zissou1[4])) %>% 
-#   mutate(fips = cnty)
-# 
-# pdf(paste0(plot_dir,"Fig1_County_HHI_no_dots_categorical.pdf"), width = 12, height = 8, onefile = TRUE)
-# 
-# for(i in 2000:2022){
-#   
-#   hospital_year <- hospitals %>%  filter(year_id == i, 
-#                                          y <1e6 & x >-2e6) # later, should double check what happened to these 2 hospitals with weird vals )  
-#   hhi_county_year <- hhi_county_wide %>% filter(year_id == i)
-#   
-#   p <- plot_usmap(data = hhi_county_year, values = "hhi_cat", regions = "counties") +
-#     scale_fill_manual(values = hhi_colors_vector, name = "County-level Hospital HHI\n(30-min drive-time)", drop = F) +
-#     labs(title = paste0("\nCounty-level hospital HHI (using the 30-minute drive-time), ", i)) +
-#     theme(plot.title = element_text(size=20)) +
-#     theme(legend.position = "right",
-#           legend.justification = "top",
-#           legend.key.height=unit(1.35,"cm"),
-#           legend.title = element_text(size=14),
-#           legend.text=element_text(size=12),
-#           plot.caption = element_text(hjust = 0)) 
-#   
-#   print(p)
-# }
-
 
 # -------------------------------------------------------------------------------------------
 
