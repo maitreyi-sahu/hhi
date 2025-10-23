@@ -4,28 +4,15 @@
 
 # ==============================================================================
 
-rm(list=ls())
+pacman::p_load('RColorBrewer', 'GGally')
 
-options(scipen = 999, digits = 5)
-
-# Packages
-pacman::p_load(dplyr, ggplot2, data.table, arrow) 
-#install.packages("GGally", lib = "~/rpackages")
-#install.packages("RColorBrewer", lib = "~/rpackages")
-library("RColorBrewer", lib.loc = "~/rpackages")
-library("GGally", lib.loc = "~/rpackages")
-
-# Directories 
-dir <- "/mnt/share/resource_tracking/us_value/data/hospital_hhi/"
-out_dir <- paste0(dir, "plots/scatters/")
+source('init.R')
+source("plot_functions.R")
 
 # Load data
-hhi_individ_wide <- read_feather(paste0(dir, "processed/compiled_hhi/compiled_hhi_individ_wide.feather")) %>% select(-hrrnum) %>% setDT()
-hhi_hrr_wide <- read_feather(paste0(dir, "processed/compiled_hhi/compiled_hhi_hrr_wide.feather")) %>% setDT()
-hhi_state_wide <- read_feather(paste0(dir, "processed/compiled_hhi/compiled_hhi_state_wide.feather")) %>%  select(-location_id, -location_name) %>% setDT()
-
-# source columns of interest and labels
-source("~/repos/us_value/1_data_compilation/4_hospital_hhi/02_plots/plot_functions.R")
+hhi_individ_wide <- read_feather(paste0(data_dir, "processed/compiled_hhi/compiled_hhi_individ_wide.feather")) %>% select(-hrrnum) %>% setDT()
+hhi_hrr_wide <- read_feather(paste0(data_dir, "processed/compiled_hhi/compiled_hhi_hrr_wide.feather")) %>% setDT()
+hhi_state_wide <- read_feather(paste0(data_dir, "processed/compiled_hhi/compiled_hhi_state_wide.feather")) %>%  select(-location_id, -location_name) %>% setDT()
 
 # ==============================================================================
 
@@ -113,7 +100,7 @@ plot_correlation <- function(vars, custom = F, vector_name, lvl) {
   
   p_size <- length(vars)*2
   
-  ggsave(p, file = paste0(out_dir, "correlation_", vector_name,"_",lvl,".pdf"), width = p_size, height = p_size)
+  ggsave(p, file = paste0(plot_dir, "scatter/correlation_", vector_name,"_",lvl,".pdf"), width = p_size, height = p_size)
 }
 
 # ==============================================================================
